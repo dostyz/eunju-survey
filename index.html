@@ -16,19 +16,16 @@
       min-height: 100vh;
       font-family: Arial, "Noto Sans KR", sans-serif;
 
-      /* 연보라 배경 + 검은 별 */
+      /* 연보라 배경 */
       background-color: #eee6ff;
-      background-image:
-        radial-gradient(circle, #111 1.5px, transparent 1.5px),
-        radial-gradient(circle, #111 1px, transparent 1px);
-      background-size: 90px 90px, 55px 55px;
-      background-position: 10px 20px, 35px 60px;
+      position: relative;
 
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 30px 15px;
     }
+    
 
     .container {
       width: 100%;
@@ -262,10 +259,67 @@
         font-size: 12px;
       }
     }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      color: #111;
+      line-height: 1;
+    }
+
+    .star1  { left: 7%;  top: 10%; font-size: 12px; }
+    .star2  { left: 19%; top: 25%; font-size: 18px; }
+    .star3  { left: 34%; top: 8%;  font-size: 9px; }
+    .star4  { left: 48%; top: 18%; font-size: 15px; }
+    .star5  { left: 67%; top: 7%;  font-size: 11px; }
+    .star6  { left: 86%; top: 16%; font-size: 17px; }
+    .star7  { left: 11%; top: 43%; font-size: 9px; }
+    .star8  { left: 28%; top: 55%; font-size: 14px; }
+    .star9  { left: 43%; top: 38%; font-size: 19px; }
+    .star10 { left: 61%; top: 48%; font-size: 10px; }
+    .star11 { left: 78%; top: 37%; font-size: 16px; }
+    .star12 { left: 93%; top: 54%; font-size: 11px; }
+    .star13 { left: 5%;  top: 72%; font-size: 16px; }
+    .star14 { left: 22%; top: 84%; font-size: 10px; }
+    .star15 { left: 39%; top: 70%; font-size: 17px; }
+    .star16 { left: 55%; top: 88%; font-size: 12px; }
+    .star17 { left: 73%; top: 68%; font-size: 9px; }
+    .star18 { left: 89%; top: 82%; font-size: 18px; }
+    .star19 { left: 15%; top: 61%; font-size: 13px; }
+    .star20 { left: 51%; top: 57%; font-size: 8px; }
   </style>
 </head>
 
 <body>
+
+  <div class="stars">
+    <span class="star star1">★</span>
+    <span class="star star2">★</span>
+    <span class="star star3">★</span>
+    <span class="star star4">★</span>
+    <span class="star star5">★</span>
+    <span class="star star6">★</span>
+    <span class="star star7">★</span>
+    <span class="star star8">★</span>
+    <span class="star star9">★</span>
+    <span class="star star10">★</span>
+    <span class="star star11">★</span>
+    <span class="star star12">★</span>
+    <span class="star star13">★</span>
+    <span class="star star14">★</span>
+    <span class="star star15">★</span>
+    <span class="star star16">★</span>
+    <span class="star star17">★</span>
+    <span class="star star18">★</span>
+    <span class="star star19">★</span>
+    <span class="star star20">★</span>
+  </div>
 
   <div class="container">
 
