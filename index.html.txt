@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>전은주 익명 평가</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+
+      /* 연보라 배경 + 검은 별 */
+      background-color: #eee6ff;
+      background-image:
+        radial-gradient(circle, #111 1.5px, transparent 1.5px),
+        radial-gradient(circle, #111 1px, transparent 1px);
+      background-size: 90px 90px, 55px 55px;
+      background-position: 10px 20px, 35px 60px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: white;
+      border-radius: 25px;
+      padding: 30px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .question {
+      margin-bottom: 23px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 9px;
+      font-size: 16px;
+    }
+
+    .required {
+      color: #8d5cff;
+      font-size: 13px;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 13px;
+      border: 1.5px solid #ddd;
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: #9b75ff;
+      box-shadow: 0 0 0 3px rgba(155,117,255,0.15);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .score-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    .score-container label {
+      flex: 1;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .score-container input {
+      display: none;
+    }
+
+    .score {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 45px;
+      border: 1.5px solid #ddd;
+      border-radius: 12px;
+      font-weight: bold;
+      color: #555;
+      transition: 0.2s;
+    }
+
+    .score-container input:checked + .score {
+      background: #9b75ff;
+      border-color: #9b75ff;
+      color: white;
+    }
+
+    .bottom {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .submit-btn {
+      flex: 1;
+      border: none;
+      background: #9b75ff;
+      color: white;
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover {
+      background: #8358ef;
+    }
+
+    .admin-btn {
+      width: 65px;
+      border: none;
+      background: #f1edf9;
+      border-radius: 14px;
+      font-size: 21px;
+      cursor: pointer;
+    }
+
+    .admin-btn:hover {
+      background: #e4dcf5;
+    }
+
+    /* 관리자 화면 */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      width: 100%;
+      max-width: 1000px;
+      max-height: 90vh;
+      overflow: auto;
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+    }
+
+    .close-btn {
+      border: none;
+      background: #eee;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .password-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .password-box input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    .password-box button {
+      border: none;
+      background: #9b75ff;
+      color: white;
+      border-radius: 10px;
+      padding: 0 20px;
+      cursor: pointer;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .admin-table th {
+      background: #f3effb;
+      white-space: nowrap;
+    }
+
+    .empty {
+      text-align: center;
+      color: #888;
+      padding: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 22px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .admin-table {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>전은주 익명 평가</h1>
+
+    <div class="subtitle">
+      솔직하게 평가해주세요 :)
+    </div>
+
+    <form id="surveyForm">
+
+      <!-- 1. 익명 닉네임 -->
+      <div class="question">
+        <label>
+          1. 익명 닉네임
+          <span class="required">(필수)</span>
+        </label>
+
+        <input
+          type="text"
+          id="nickname"
+          placeholder="닉네임을 입력해주세요"
+          required
+        >
+      </div>
+
+
+      <!-- 2. 성격 점수 -->
+      <div class="question">
+        <label>2. 전은주의 성격 점수는?</label>
+
+        <div class="score-container">
+
+          <label>
+            <input type="radio" name="personality" value="1">
+            <div class="score">1</div>
+          </label>
+
+          <label>
+            <input type="radio" name="personality" value="2">
+            <div class="score">2</div>
+          </label>
+
+          <label>
+            <input type="radio" name="personality" value="3">
+            <div class="score">3</div>
+          </label>
+
+          <label>
+            <input type="radio" name="personality" value="4">
+            <div class="score">4</div>
+          </label>
+
+          <label>
+            <input type="radio" name="personality" value="5">
+            <div class="score">5</div>
+          </label>
+
+        </div>
+      </div>
+
+
+      <!-- 3. 외모 점수 -->
+      <div class="question">
+        <label>3. 전은주의 외모 점수는?</label>
+
+        <div class="score-container">
+
+          <label>
+            <input type="radio" name="appearance" value="1">
+            <div class="score">1</div>
+          </label>
+
+          <label>
+            <input type="radio" name="appearance" value="2">
+            <div class="score">2</div>
+          </label>
+
+          <label>
+            <input type="radio" name="appearance" value="3">
+            <div class="score">3</div>
+          </label>
+
+          <label>
+            <input type="radio" name="appearance" value="4">
+            <div class="score">4</div>
+          </label>
+
+          <label>
+            <input type="radio" name="appearance" value="5">
+            <div class="score">5</div>
+          </label>
+
+        </div>
+      </div>
+
+
+      <!-- 4. 단점 -->
+      <div class="question">
+        <label>4. 전은주의 단점</label>
+
+        <textarea
+          id="weakness"
+          placeholder="솔직하게 적어주세요"
+        ></textarea>
+      </div>
+
+
+      <!-- 5. 장점 -->
+      <div class="question">
+        <label>5. 전은주의 장점</label>
+
+        <textarea
+          id="strength"
+          placeholder="좋았던 점을 적어주세요"
+        ></textarea>
+      </div>
+
+
+      <!-- 6. 하고 싶은 말 -->
+      <div class="question">
+        <label>6. 하고 싶은 말</label>
+
+        <textarea
+          id="message"
+          placeholder="하고 싶은 말을 자유롭게 적어주세요"
+        ></textarea>
+      </div>
+
+
+      <!-- 제출 + 관리자 버튼 -->
+      <div class="bottom">
+
+        <button type="submit" class="submit-btn">
+          제출하기
+        </button>
+
+        <button
+          type="button"
+          class="admin-btn"
+          id="adminBtn"
+          title="관리자"
+        >
+          ♥🔒
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+
+  <!-- 관리자 모달 -->
+  <div class="modal" id="adminModal">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h2>관리자</h2>
+
+        <button class="close-btn" id="closeModal">
+          ×
+        </button>
+      </div>
+
+
+      <!-- 비밀번호 -->
+      <div class="password-box">
+
+        <input
+          type="password"
+          id="adminPassword"
+          placeholder="관리자 비밀번호"
+        >
+
+        <button id="loginBtn">
+          확인
+        </button>
+
+      </div>
+
+
+      <!-- 응답 결과 -->
+      <div id="responseArea"></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Firebase -->
+  <script type="module">
+
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      orderBy,
+      getDocs
+    }
+      from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+
+    // ==========================================
+    // Firebase 설정
+    // ==========================================
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAav0uoNG0j-XmF23l6tuHS94L1ano-DME",
+      authDomain: "eunjusurvey.firebaseapp.com",
+      databaseURL: "https://eunjusurvey-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "eunjusurvey",
+      storageBucket: "eunjusurvey.firebasestorage.app",
+      messagingSenderId: "406884485526",
+      appId: "1:406884485526:web:3eb45d5823879470d6b5b7",
+      measurementId: "G-NLVFWTS185"
+    };
+
+
+    // Firebase 초기화
+    const app = initializeApp(firebaseConfig);
+
+    // ⭐ 이번 사이트는 Firestore 사용
+    const db = getFirestore(app);
+
+
+    // 관리자 비밀번호
+    const ADMIN_PASSWORD = "1608";
+
+
+    // ==========================================
+    // 설문 제출
+    // ==========================================
+
+    const surveyForm = document.getElementById("surveyForm");
+
+    surveyForm.addEventListener("submit", async function(event) {
+
+      event.preventDefault();
+
+
+      const nickname =
+        document.getElementById("nickname").value.trim();
+
+      const personality =
+        document.querySelector(
+          'input[name="personality"]:checked'
+        )?.value || "";
+
+      const appearance =
+        document.querySelector(
+          'input[name="appearance"]:checked'
+        )?.value || "";
+
+      const weakness =
+        document.getElementById("weakness").value.trim();
+
+      const strength =
+        document.getElementById("strength").value.trim();
+
+      const message =
+        document.getElementById("message").value.trim();
+
+
+      if (!nickname) {
+        alert("닉네임을 입력해주세요.");
+        return;
+      }
+
+
+      try {
+
+        // Firestore의 responses 컬렉션에 저장
+        await addDoc(
+          collection(db, "responses"),
+          {
+            nickname: nickname,
+            personality: personality,
+            appearance: appearance,
+            weakness: weakness,
+            strength: strength,
+            message: message,
+            createdAt: serverTimestamp()
+          }
+        );
+
+
+        alert("평가가 제출되었습니다!");
+
+        surveyForm.reset();
+
+      } catch (error) {
+
+        console.error("Firestore 저장 오류:", error);
+
+        alert(
+          "제출에 실패했습니다.\n\n" +
+          "Firebase 설정 또는 Firestore 보안 규칙을 확인해주세요."
+        );
+
+      }
+
+    });
+
+
+    // ==========================================
+    // 관리자 버튼
+    // ==========================================
+
+    const adminBtn =
+      document.getElementById("adminBtn");
+
+    const adminModal =
+      document.getElementById("adminModal");
+
+    const closeModal =
+      document.getElementById("closeModal");
+
+
+    adminBtn.addEventListener("click", function() {
+
+      adminModal.style.display = "flex";
+
+      document.getElementById("adminPassword").value = "";
+
+      document.getElementById("responseArea").innerHTML = "";
+
+    });
+
+
+    closeModal.addEventListener("click", function() {
+
+      adminModal.style.display = "none";
+
+    });
+
+
+    // 모달 바깥 클릭
+    adminModal.addEventListener("click", function(event) {
+
+      if (event.target === adminModal) {
+
+        adminModal.style.display = "none";
+
+      }
+
+    });
+
+
+    // ==========================================
+    // 관리자 로그인
+    // ==========================================
+
+    const loginBtn =
+      document.getElementById("loginBtn");
+
+
+    loginBtn.addEventListener("click", async function() {
+
+      const password =
+        document.getElementById("adminPassword").value;
+
+
+      if (password !== ADMIN_PASSWORD) {
+
+        alert("비밀번호가 틀렸습니다.");
+
+        return;
+
+      }
+
+
+      await loadResponses();
+
+    });
+
+
+    // ==========================================
+    // Firestore 응답 불러오기
+    // ==========================================
+
+    async function loadResponses() {
+
+      const responseArea =
+        document.getElementById("responseArea");
+
+
+      responseArea.innerHTML =
+        "<p>응답을 불러오는 중...</p>";
+
+
+      try {
+
+        const responsesQuery = query(
+          collection(db, "responses"),
+          orderBy("createdAt", "desc")
+        );
+
+
+        const snapshot =
+          await getDocs(responsesQuery);
+
+
+        if (snapshot.empty) {
+
+          responseArea.innerHTML =
+            '<div class="empty">아직 제출된 평가가 없습니다.</div>';
+
+          return;
+
+        }
+
+
+        let html = `
+
+          <table class="admin-table">
+
+            <thead>
+
+              <tr>
+                <th>닉네임</th>
+                <th>성격</th>
+                <th>외모</th>
+                <th>단점</th>
+                <th>장점</th>
+                <th>하고 싶은 말</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+        `;
+
+
+        snapshot.forEach(function(doc) {
+
+          const data = doc.data();
+
+
+          html += `
+
+            <tr>
+
+              <td>${escapeHtml(data.nickname || "")}</td>
+
+              <td>${escapeHtml(data.personality || "-")}</td>
+
+              <td>${escapeHtml(data.appearance || "-")}</td>
+
+              <td>${escapeHtml(data.weakness || "")}</td>
+
+              <td>${escapeHtml(data.strength || "")}</td>
+
+              <td>${escapeHtml(data.message || "")}</td>
+
+            </tr>
+
+          `;
+
+        });
+
+
+        html += `
+
+            </tbody>
+
+          </table>
+
+        `;
+
+
+        responseArea.innerHTML = html;
+
+
+      } catch (error) {
+
+        console.error("Firestore 불러오기 오류:", error);
+
+
+        responseArea.innerHTML = `
+
+          <p style="color:red;">
+            데이터를 불러오지 못했습니다.
+          </p>
+
+          <p style="font-size:13px;color:#777;">
+            ${escapeHtml(error.message)}
+          </p>
+
+        `;
+
+      }
+
+    }
+
+
+    // ==========================================
+    // HTML 문자 보안 처리
+    // ==========================================
+
+    function escapeHtml(value) {
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+  </script>
+
+</body>
+</html>
